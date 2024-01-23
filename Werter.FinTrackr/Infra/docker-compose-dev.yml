@@ -1,0 +1,27 @@
+version: "3.8"
+
+networks:
+  fintrackr:
+    
+#volumes:
+#  mongodb_data:
+
+
+services:
+  banco_sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-CU9-ubuntu-20.04
+    container_name: banco_sqlserver
+    user: root
+    ports:
+      - "1488:1433"
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: '!123Senh@Forte'
+      MSSQL_PID: Express
+    networks:
+      - fintrackr
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
