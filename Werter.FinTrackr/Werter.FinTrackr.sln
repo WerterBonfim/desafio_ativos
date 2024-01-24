@@ -22,7 +22,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{58D834BA-50E5-43AA-9524-D84959026951}"
 	ProjectSection(SolutionItems) = preProject
 		..\README.md = ..\README.md
+		..\endpoints.http = ..\endpoints.http
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Werter.FinTrackr.Shared", "Src\Werter.FinTrackr.Shared\Werter.FinTrackr.Shared.csproj", "{519ED368-0479-4E38-A0EB-F65773544343}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +37,7 @@ Global
 		{4145F882-4EBB-4ECA-8F47-D7F6AA22CAB0} = {BDCF5879-D595-4D9E-8C44-A22051115861}
 		{897BA1E3-54BF-4B5A-AEB6-CD8046C0E518} = {BDCF5879-D595-4D9E-8C44-A22051115861}
 		{A820FE68-173A-442A-909B-3E452547D178} = {9E96992A-AD18-4D5E-A3E8-D461AD5C0AD5}
+		{519ED368-0479-4E38-A0EB-F65773544343} = {BDCF5879-D595-4D9E-8C44-A22051115861}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{291EF2F5-DCC6-41BF-BF77-826DB1E509CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -52,5 +56,9 @@ Global
 		{A820FE68-173A-442A-909B-3E452547D178}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A820FE68-173A-442A-909B-3E452547D178}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A820FE68-173A-442A-909B-3E452547D178}.Release|Any CPU.Build.0 = Release|Any CPU
+		{519ED368-0479-4E38-A0EB-F65773544343}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{519ED368-0479-4E38-A0EB-F65773544343}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{519ED368-0479-4E38-A0EB-F65773544343}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{519ED368-0479-4E38-A0EB-F65773544343}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

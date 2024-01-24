@@ -1,0 +1,8 @@
+@baseUrl = https://localhost:7092
+
+GET {{baseUrl}}
+
+
+### Realizar a coleta dos ativos
+
+GET {{baseUrl}}/collect-stock?stock=PETR4.SA

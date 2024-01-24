@@ -17,9 +17,10 @@ Se você quiser depurar/debbugar o projeto via VisualStudio, Rider ou VSCode. Vo
 
 Esse arquivo tem somente o serviço de banco de dados Sql Server Express
 
+No terminal:
 ```bash
 
-cd Infra
+cd FinTracker/Infra
 
 docker compose -p fin_trackr_dev -f docker-compose-dev.yml up -d
 
