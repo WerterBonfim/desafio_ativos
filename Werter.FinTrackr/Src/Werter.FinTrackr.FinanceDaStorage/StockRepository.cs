@@ -1,5 +1,4 @@
 using System.Data;
-using System.Data.Common;
 using Dapper;
 using FluentResults;
 using Microsoft.Data.SqlClient;
@@ -37,15 +36,43 @@ public sealed class StockRepository(ILogger logger, string connectionString)
 
     private static async Task InsertStockAsync(StockDto stock, IDbConnection connection, IDbTransaction transaction, CancellationToken cancellationToken)
     {
-        const string query = "INSERT INTO Stock (Value, Date) VALUES (@Value, @Date)";
+        const string query = "INSERT INTO Stock (Name, Value, Date) VALUES (@Name, @Value, @Date)";
 
         // Criando DynamicParameters
         var parameters = new DynamicParameters();
+        parameters.Add("@Name", stock.Name, DbType.String);
         parameters.Add("@Value", stock.Value, DbType.Decimal);
         parameters.Add("@Date", stock.DataAsDateTime, DbType.DateTime);
 
         var commandDefinition = new CommandDefinition(query, parameters, transaction: transaction, cancellationToken: cancellationToken);
 
         await connection.ExecuteAsync(commandDefinition);
+    }
+
+    public async Task<Result<List<Stock>>> ListAsync(string input, CancellationToken cancellationToken)
+    {
+        try
+        {
+            logger.LogInformation("[StockRepository] Iniciando a busca dos dados no banco de dados");
+
+            await using var connection = new SqlConnection(connectionString);
+            await connection.OpenAsync(cancellationToken);
+
+            const string query = "SELECT top 30 * FROM Stock where Name = @Name order by Date";
+            
+            var parameters = new DynamicParameters();
+            parameters.Add("@Name", input, DbType.String);
+            
+            var commandDefinition = new CommandDefinition(query, parameters, cancellationToken: cancellationToken);
+            var result = await connection.QueryAsync<Stock>(commandDefinition);
+            
+            logger.LogInformation("[StockRepository] Dados encontrados no banco de dados com sucesso");
+            return Result.Ok(result.ToList());
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "[StockRepository] Erro ao buscar os dados no banco de dados");
+            return Result.Fail<List<Stock>>("Ocorreu um erro ao tentar buscar as acoes no banco de dados");
+        }
     }
 }

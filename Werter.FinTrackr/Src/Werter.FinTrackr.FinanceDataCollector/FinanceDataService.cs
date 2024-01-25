@@ -38,7 +38,7 @@ public sealed class FinanceDataService(ILogger<FinanceDataService> logger, HttpC
 
             var last30Stocks = result.Indicators.Quote[0].Open
                                      .Take(30)
-                                     .Select((value, index) => new StockDto(value, result.Timestamp[index]))
+                                     .Select((value, index) => new StockDto(stockName, value, result.Timestamp[index]))
                                      .ToList();
 
             return Result.Ok(last30Stocks);

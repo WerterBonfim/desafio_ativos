@@ -1,4 +1,3 @@
-using FluentResults;
 using Werter.FinTrackr.FinanceDaStorage;
 using Werter.FinTrackr.FinanceDataAPI.UseCases;
 using Werter.FinTrackr.FinanceDataCollector;
@@ -18,9 +17,8 @@ public static class ApiConfig
         services.AddHostedService<SeedWork>();
         
         services.AddScoped<CollectStockUseCase>();
-        
-        
 
+        services.AddScoped<StockUseCase>();
 
     }
 

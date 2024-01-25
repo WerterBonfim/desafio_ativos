@@ -19,6 +19,17 @@ app.MapGet("/collect-stock", async (
                return Results.Ok(result);
            });
 
+
+app.MapGet("/list-stocks", async (
+               [FromServices] StockUseCase useCase,
+               [FromQuery] string input = "PETR4.SA",
+               CancellationToken cancellationToken = default
+           ) =>
+           {
+               var result = await useCase.ExecuteAsync(input, cancellationToken);
+               return Results.Ok(result);
+           });
+
 app.UseApiConfiguration(app.Environment);
 
 app.Run();

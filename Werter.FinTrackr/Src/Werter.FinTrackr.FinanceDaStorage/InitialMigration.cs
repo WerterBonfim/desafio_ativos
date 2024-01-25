@@ -1,6 +1,8 @@
+using Dapper;
 using FluentResults;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
+using Werter.FinTrackr.Shared;
 
 namespace Werter.FinTrackr.FinanceDaStorage;
 
@@ -36,27 +38,32 @@ public class InitialMigration
         }
     }
 
+    private static async Task ChangeDatabaseAsync(SqlConnection connection, string databaseName, CancellationToken cancellationToken) 
+        => await connection.ExecuteAsync(new CommandDefinition("USE " + databaseName, cancellationToken: cancellationToken));
+
     private static async Task CreateObjectsIfNotExisteAsync(SqlConnection connection, CancellationToken cancellationToken)
     {
         const string query = "IF NOT EXISTS (SELECT [name] FROM sys.databases WHERE [name] = N'DB_FinTrackr') CREATE DATABASE DB_FinTrackr";
-        var command = new SqlCommand(query, connection);
-        await command.ExecuteNonQueryAsync(cancellationToken);
+        var commandDefinition = new CommandDefinition(query, cancellationToken: cancellationToken);
+        await connection.ExecuteAsync(commandDefinition);
 
-        // Agora que o banco de dados foi criado, você pode abrir uma nova conexão para ele
-        connection.ChangeDatabase("DB_FinTrackr");
+        await ChangeDatabaseAsync(connection, Constants.DbName, cancellationToken);
 
         // Verificar se a tabela existe e criá-la se não existir
-        const string createTableIfNotExists = @"
-            IF OBJECT_ID('[dbo].[Stock]', 'U') IS NULL
-                CREATE TABLE [dbo].[Stock]
-                (
-                    [Id]    INT             NOT NULL IDENTITY (1,1) PRIMARY KEY,
-                    [Value] DECIMAL(18, 14),
-                    [Date]  DATETIME        NOT NULL
-                )";
+        const string createTableIfNotExists = """
+                                                          IF OBJECT_ID('[dbo].[Stock]', 'U') IS NULL
+                                                              CREATE TABLE [dbo].[Stock]
+                                                              (
+                                                                  [Id]    INT             NOT NULL IDENTITY (1,1) PRIMARY KEY,
+                                                                  [Name]  VARCHAR(50)     NOT NULL,
+                                                                  [Value] DECIMAL(18, 14),
+                                                                  [Date]  DATETIME        NOT NULL
+                                                              )
+                                              """;
+        
+        var createTableIfNotExistsCommand = new CommandDefinition(createTableIfNotExists, cancellationToken: cancellationToken);
+        await connection.ExecuteAsync(createTableIfNotExistsCommand);
 
-        await using var commandCreateTable = new SqlCommand(createTableIfNotExists, connection);
-        await command.ExecuteNonQueryAsync(cancellationToken);
     }
 
 
