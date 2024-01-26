@@ -1,3 +1,4 @@
+using System.Data;
 using Dapper;
 using FluentResults;
 using Microsoft.Data.SqlClient;
@@ -18,16 +19,15 @@ public class InitialMigration
     }
 
 
-    public async Task<Result> Execute(CancellationToken cancellationToken)
+    public Result Execute(CancellationToken cancellationToken)
     {
         try
         {
             _logger.LogInformation("[InitialMigration] Verificar se existe a migração inicial");
 
-            await using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync(cancellationToken);
+            using var connection = new SqlConnection(_connectionString);
 
-            await CreateObjectsIfNotExisteAsync(connection, cancellationToken);
+            CreateObjectsIfNotExisteAsync(connection, cancellationToken);
             
             return Result.Ok();
         }
@@ -38,31 +38,31 @@ public class InitialMigration
         }
     }
 
-    private static async Task ChangeDatabaseAsync(SqlConnection connection, string databaseName, CancellationToken cancellationToken) 
-        => await connection.ExecuteAsync(new CommandDefinition("USE " + databaseName, cancellationToken: cancellationToken));
+    private static void ChangeDatabaseAsync(IDbConnection connection, string databaseName, CancellationToken cancellationToken) 
+        => connection.ExecuteAsync(new CommandDefinition("USE " + databaseName, cancellationToken: cancellationToken));
 
-    private static async Task CreateObjectsIfNotExisteAsync(SqlConnection connection, CancellationToken cancellationToken)
+    private static void CreateObjectsIfNotExisteAsync(IDbConnection connection, CancellationToken cancellationToken)
     {
         const string query = "IF NOT EXISTS (SELECT [name] FROM sys.databases WHERE [name] = N'DB_FinTrackr') CREATE DATABASE DB_FinTrackr";
         var commandDefinition = new CommandDefinition(query, cancellationToken: cancellationToken);
-        await connection.ExecuteAsync(commandDefinition);
+        connection.Execute(commandDefinition);
 
-        await ChangeDatabaseAsync(connection, Constants.DbName, cancellationToken);
+        ChangeDatabaseAsync(connection, Constants.DbName, cancellationToken);
 
-        // Verificar se a tabela existe e criá-la se não existir
         const string createTableIfNotExists = """
-                                                          IF OBJECT_ID('[dbo].[Stock]', 'U') IS NULL
-                                                              CREATE TABLE [dbo].[Stock]
-                                                              (
-                                                                  [Id]    INT             NOT NULL IDENTITY (1,1) PRIMARY KEY,
-                                                                  [Name]  VARCHAR(50)     NOT NULL,
-                                                                  [Value] DECIMAL(18, 14),
-                                                                  [Date]  DATETIME        NOT NULL
-                                                              )
+                                                  USE DB_FinTrackr
+                                                  IF OBJECT_ID('[dbo].[Stock]', 'U') IS NULL
+                                                      CREATE TABLE [dbo].[Stock]
+                                                      (
+                                                          [Id]    INT             NOT NULL IDENTITY (1,1) PRIMARY KEY,
+                                                          [Name]  VARCHAR(50)     NOT NULL,
+                                                          [Value] DECIMAL(18, 14),
+                                                          [Date]  DATETIME        NOT NULL
+                                                      )
                                               """;
         
         var createTableIfNotExistsCommand = new CommandDefinition(createTableIfNotExists, cancellationToken: cancellationToken);
-        await connection.ExecuteAsync(createTableIfNotExistsCommand);
+        connection.Execute(createTableIfNotExistsCommand);
 
     }
 

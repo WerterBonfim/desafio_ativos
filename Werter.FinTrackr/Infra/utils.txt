@@ -1,0 +1,7 @@
+USE master;
+GO
+ALTER DATABASE DB_FinTrackr SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+GO
+
+
+drop database DB_FinTrackr

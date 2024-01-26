@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infra", "Infra", "{A47C5849
 		Infra\docker-compose.yml = Infra\docker-compose.yml
 		Infra\script_inicial.sql = Infra\script_inicial.sql
 		Infra\docker-compose-dev.yml = Infra\docker-compose-dev.yml
+		Infra\utils.txt = Infra\utils.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Werter.FinTrackr.FinanceDataCollector", "Src\Werter.FinTrackr.FinanceDataCollector\Werter.FinTrackr.FinanceDataCollector.csproj", "{291EF2F5-DCC6-41BF-BF77-826DB1E509CC}"

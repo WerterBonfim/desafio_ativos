@@ -6,3 +6,15 @@ GET {{baseUrl}}
 ### Realizar a coleta dos ativos
 
 GET {{baseUrl}}/collect-stock?stock=PETR4.SA
+
+
+###
+
+GET {{baseUrl}}/list-stocks?stock=PETR4.SA
+
+
+### API Yahoo
+
+@inicio = 1704078000
+@fim = 1706238000
+GET https://query1.finance.yahoo.com/v8/finance/chart/PETR4.SA?period1={{inicio}}&period2={{fim}}&interval=1d

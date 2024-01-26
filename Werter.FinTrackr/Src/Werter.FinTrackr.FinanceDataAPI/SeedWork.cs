@@ -4,10 +4,14 @@ namespace Werter.FinTrackr.FinanceDataAPI;
 
 public class SeedWork(ILogger<SeedWork> logger, InitialMigration initialMigration) : IHostedService
 {
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
         logger.LogInformation("[SeedWork] Iniciando a migração inicial");
-        await initialMigration.Execute(cancellationToken);
+        initialMigration.Execute(cancellationToken);
+
+        logger.LogInformation("[SeedWork] Migração inicial concluída");
+        
+        return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
