@@ -15,7 +15,7 @@ RUN dotnet build "Werter.FinTrackr.FinanceDataAPI.csproj" -c $BUILD_CONFIGURATIO
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "Werter.FinTrackr.FinanceDataAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Werter.FinTrackr.FinanceDataAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false 
 
 FROM base AS final
 WORKDIR /app

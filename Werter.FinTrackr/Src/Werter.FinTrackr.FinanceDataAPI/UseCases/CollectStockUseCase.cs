@@ -6,8 +6,8 @@ namespace Werter.FinTrackr.FinanceDataAPI.UseCases;
 
 public sealed class CollectStockUseCase(
     ILogger<CollectStockUseCase> logger,
-    FinanceDataService financeDataService,
-    StockRepository stockRepository
+    IFinanceDataService financeDataService,
+    IStockRepository stockRepository
 ) : IUseCase<string, Result>
 {
     public async Task<Result> ExecuteAsync(string input, CancellationToken cancellationToken)
@@ -21,6 +21,10 @@ public sealed class CollectStockUseCase(
 
         var stocks = collectResult.Value;
 
+        var resultOfTruncate = await stockRepository.TruncateAsync(cancellationToken);
+        if (resultOfTruncate.IsFailed)
+            return Result.Fail(resultOfTruncate.Errors);
+        
         var insertResult = await stockRepository.InsertAsync(stocks, cancellationToken);
         
         return insertResult;

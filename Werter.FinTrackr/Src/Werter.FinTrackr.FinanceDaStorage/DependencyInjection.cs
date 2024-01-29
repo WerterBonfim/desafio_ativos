@@ -15,7 +15,7 @@ public static class DependencyInjection
                                      ?? throw new InvalidOperationException("Nao foi possivel encontrar a string de Conexão (InitialMigration) atraves de appsettings/env");
 
 
-        services.AddScoped<StockRepository>(x =>
+        services.AddScoped<IStockRepository, StockRepository>(x =>
         {
             var logger = x.GetRequiredService<ILogger<StockRepository>>();
             return new StockRepository(logger, finTrackrConnection);

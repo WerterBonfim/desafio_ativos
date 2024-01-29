@@ -1,0 +1,74 @@
+version: "3.8"
+
+networks:
+  fintrackr:
+
+volumes:
+  logs:
+  banco_sql:
+
+services:
+  app:
+    build:
+      context: ../
+      dockerfile: Src/Werter.FinTrackr.FinanceDataAPI/Dockerfile
+    image: api-fin-trackr
+    user: root
+    volumes:
+      - logs:/var/log/app
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+    ports:
+      - "8888:8080"
+      - "9999:443"
+    networks:
+      - fintrackr
+    depends_on:
+      banco_sqlserver:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__InitialMigration: Server=banco_sqlserver;User Id=sa;Password=!123Senh@Forte;TrustServerCertificate=True;MultipleActiveResultSets=True
+      ConnectionStrings__FinTrackr: Server=banco_sqlserver;Database=DB_FinTrackr;User Id=sa;Password=!123Senh@Forte;TrustServerCertificate=True;MultipleActiveResultSets=True
+  
+  
+  banco_sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-CU9-ubuntu-20.04
+    container_name: banco_sqlserver
+    user: root
+    ports:
+      - "1488:1433"
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: '!123Senh@Forte'
+      MSSQL_PID: Express
+    networks:
+      - fintrackr
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+    healthcheck:
+      test: [ "CMD", "/opt/mssql-tools/bin/sqlcmd", "-U", "sa", "-P", "!123Senh@Forte", "-Q", "SELECT 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - banco_sql:/var/opt/mssql
+
+
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "7777:8080"
+    depends_on: 
+      app:
+        condition: service_started

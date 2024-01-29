@@ -9,7 +9,8 @@ builder.Services.AddApiConfiguration(builder);
 var app = builder.Build();
 
 
-app.MapGet("/", () => "Hello World!");
+app.MapHealthChecks("/health");
+
 app.MapGet("/collect-stock", async (
                [FromServices] CollectStockUseCase useCase,
                [FromQuery] string stock = "PETR4.SA",

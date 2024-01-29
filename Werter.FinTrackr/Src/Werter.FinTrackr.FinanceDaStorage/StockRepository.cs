@@ -7,7 +7,14 @@ using Werter.FinTrackr.Shared.Models;
 
 namespace Werter.FinTrackr.FinanceDaStorage;
 
-public sealed class StockRepository(ILogger logger, string connectionString)
+public interface IStockRepository
+{
+    Task<Result> InsertAsync(IEnumerable<StockDto> produtos, CancellationToken cancellationToken);
+    Task<Result> TruncateAsync(CancellationToken cancellationToken);
+    Task<Result<List<Stock>>> ListAsync(string input, CancellationToken cancellationToken);
+}
+
+public class StockRepository(ILogger logger, string connectionString) : IStockRepository
 {
     public async Task<Result> InsertAsync(IEnumerable<StockDto> produtos, CancellationToken cancellationToken)
     {
@@ -59,13 +66,13 @@ public sealed class StockRepository(ILogger logger, string connectionString)
             await connection.OpenAsync(cancellationToken);
 
             const string query = "SELECT top 30 * FROM Stock where Name = @Name order by Date";
-            
+
             var parameters = new DynamicParameters();
             parameters.Add("@Name", input, DbType.String);
-            
+
             var commandDefinition = new CommandDefinition(query, parameters, cancellationToken: cancellationToken);
             var result = await connection.QueryAsync<Stock>(commandDefinition);
-            
+
             logger.LogInformation("[StockRepository] Dados encontrados no banco de dados com sucesso");
             return Result.Ok(result.ToList());
         }
@@ -73,6 +80,26 @@ public sealed class StockRepository(ILogger logger, string connectionString)
         {
             logger.LogError(e, "[StockRepository] Erro ao buscar os dados no banco de dados");
             return Result.Fail<List<Stock>>("Ocorreu um erro ao tentar buscar as acoes no banco de dados");
+        }
+    }
+
+    public async Task<Result> TruncateAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            logger.LogInformation("[StockRepository] Iniciando a limpeza dos dados no banco de dados");
+
+            await using var connection = new SqlConnection(connectionString);
+            var command = new CommandDefinition("TRUNCATE TABLE Stock", connection, cancellationToken: cancellationToken);
+            await connection.ExecuteAsync(command);
+            
+            logger.LogInformation("[StockRepository] Dados limpos no banco de dados com sucesso");
+            return Result.Ok();
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "[StockRepository] Erro ao limpar os dados no banco de dados");
+            return Result.Fail("Erro ao limpar os dados no banco de dados");
         }
     }
 }

@@ -5,9 +5,22 @@ using Werter.FinTrackr.Shared.Models;
 
 namespace Werter.FinTrackr.FinanceDataCollector;
 
-public sealed class FinanceDataService(ILogger<FinanceDataService> logger, HttpClient httpClient)
+public interface IFinanceDataService
 {
-    private const string Url = "https://query1.finance.yahoo.com/v8/finance/chart/{0}";
+    Task<Result<List<StockDto>>> CollectDataAsync(string stockName, CancellationToken cancellationToken);
+}
+
+public class FinanceDataService(ILogger<FinanceDataService> logger, HttpClient httpClient) : IFinanceDataService
+{
+    private const string Url = "https://query2.finance.yahoo.com/v8/finance/chart/{0}?period1={1}&period2={2}&interval=1d";
+
+    private static string GetUrl(string stockName)
+    {
+        var first = new DateTimeOffset(DateTime.Now.Subtract(TimeSpan.FromDays(50))).ToUnixTimeSeconds();
+        var last = new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds();
+        
+        return string.Format(Url, stockName, first, last);
+    }
 
     /// <summary>
     /// 
@@ -19,7 +32,7 @@ public sealed class FinanceDataService(ILogger<FinanceDataService> logger, HttpC
     {
         try
         {
-            var url = string.Format(Url, stockName);
+            var url = GetUrl(stockName);
             var response = await httpClient.GetFromJsonAsync<RequestResultApi>(url, cancellationToken: cancellationToken);
 
             if (response is not { Erro: null })
@@ -37,8 +50,9 @@ public sealed class FinanceDataService(ILogger<FinanceDataService> logger, HttpC
             }
 
             var last30Stocks = result.Indicators.Quote[0].Open
-                                     .Take(30)
                                      .Select((value, index) => new StockDto(stockName, value, result.Timestamp[index]))
+                                     .OrderByDescending(x => x.Date)
+                                     .Take(30)
                                      .ToList();
 
             return Result.Ok(last30Stocks);

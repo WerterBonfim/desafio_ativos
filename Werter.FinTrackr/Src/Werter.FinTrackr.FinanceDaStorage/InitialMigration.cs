@@ -31,10 +31,15 @@ public class InitialMigration
             
             return Result.Ok();
         }
+        catch (SqlException e)
+        {
+            _logger.LogError(e, "[InitialMigration] Erro ao executar um comando no Sql Server relacionado a migração");
+            return Constants.InternalError;
+        }
         catch (Exception e)
         {
             _logger.LogError(e, "[InitialMigration] Erro ao executar a migração");
-            return Result.Fail("Erro ao executar a migração");
+            return Constants.InternalError;
         }
     }
 
@@ -57,7 +62,7 @@ public class InitialMigration
                                                           [Id]    INT             NOT NULL IDENTITY (1,1) PRIMARY KEY,
                                                           [Name]  VARCHAR(50)     NOT NULL,
                                                           [Value] DECIMAL(18, 14),
-                                                          [Date]  DATETIME        NOT NULL
+                                                          [Date]  Date        NOT NULL
                                                       )
                                               """;
         

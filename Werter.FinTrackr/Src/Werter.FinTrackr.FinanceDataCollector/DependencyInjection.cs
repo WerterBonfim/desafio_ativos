@@ -8,6 +8,6 @@ public static class DependencyInjection
     public static void AddFinanceDataCollector(this IServiceCollection services, ConfigurationManager configuration)
     {
         services.AddHttpClient();
-        services.AddScoped<FinanceDataService>();
+        services.AddScoped<IFinanceDataService, FinanceDataService>();
     }
 }
