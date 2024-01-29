@@ -18,7 +18,7 @@ Para executar o projeto em um ambiente de produção, siga os passos abaixo:
    ```
 2. Navegue até a pasta `Infra`:
    ```bash
-   cd desafio_ativos/Infra
+   cd desafio_ativos/Werter.FinTrackr/Infra
    ```
 3. Execute o Docker Compose:
    ```bash
@@ -35,7 +35,7 @@ Para executar o projeto em um ambiente de desenvolvimento, siga os passos abaixo
 
 1. Navegue até a pasta `Infra` (assumindo que o repositório já foi clonado):
    ```bash
-   cd desafio_ativos/Infra
+   cd desafio_ativos/Werter.FinTrackr/Infra
    ```
 2. Execute o Docker Compose com o arquivo de configuração de desenvolvimento:
    ```bash
